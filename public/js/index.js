@@ -29,8 +29,8 @@ document.getElementById("start").addEventListener("click", () => {
         console.log("GPS error:", error.message);
       },
       {
-        enableHighAccuracy: true,
-        timeout: 5000,
+        enableHighAccuracy: false,
+        timeout: 15000,
         maximumAge: 0
       }
     );
