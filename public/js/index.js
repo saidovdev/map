@@ -1,10 +1,11 @@
 const socket = io();
 
-const map = L.map("map").setView([0, 0], 10);
+const map = L.map("map").setView([0, 0], 2); // boshlang'ich dunyo ko'rinishi
 
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  attribution: "© OpenStreetMap",
-  maxZoom: 19
+L.tileLayer("https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png", {
+  attribution: "© OpenStreetMap contributors",
+  maxZoom: 19,
+  subdomains: ["a", "b", "c"]
 }).addTo(map);
 
 let marker;
@@ -29,10 +30,12 @@ document.getElementById("start").addEventListener("click", () => {
         console.log("GPS error:", error.message);
       },
       {
-        enableHighAccuracy: false,
-        timeout: 15000,
+        enableHighAccuracy: true,
+        timeout: 15000, // 15 sekund
         maximumAge: 0
       }
     );
+  } else {
+    console.log("Geolocation not supported");
   }
 });
