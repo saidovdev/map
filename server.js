@@ -23,6 +23,7 @@ io.on("connection", (socket) => {
 
   socket.on("send-location", (data) => {
     console.log("Location received:", data);
+    socket.emit('recieve-location',{data})
   });
 });
 
