@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User</title>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet" />
+</head>
+<body>
+  <div id="map" style="width:100%;height:100vh;"></div>
+
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <script>
+    mapboxgl.accessToken =
+      "pk.eyJ1IjoidW1lZGpvbjk5IiwiYSI6ImNtN3Rza3czdDB1bW4yanF5Nmg4Ym1nbmIifQ.0Z5e4Qzn8La43ouMfIxaWg";
+
+    const map = new mapboxgl.Map({
+      container: "map",
+      style: "mapbox://styles/mapbox/traffic-day-v2",
+      center: [69.47, 40.16],
+      zoom: 13,
+    });
+
+    const socket = io();
+    socket.emit("register-user");
+
+    const drivers = {};
+
+    socket.on("driver-location", ({ id, latitude, longitude }) => {
+      if (!drivers[id]) {
+        drivers[id] = new mapboxgl.Marker({ color: "red" })
+          .setLngLat([longitude, latitude])
+          .addTo(map);
+      } else {
+        drivers[id].setLngLat([longitude, latitude]);
+      }
+    });
+
+    socket.on("driver-disconnected", (id) => {
+      if (drivers[id]) {
+        drivers[id].remove();
+        delete drivers[id];
+      }
+    });
+  </script>
+</body>
+</html>
