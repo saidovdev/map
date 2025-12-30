@@ -13,44 +13,30 @@ const io = new Server(server);
 
 app.use(express.static(path.join(__dirname, "public")));
 
-/* 🔹 ROUTES */
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/user.html"));
+  res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-app.get("/driver", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/driver.html"));
-});
-
-/* 🔹 SOCKET STATE */
 const drivers = {}; // { socketId: { lat, lng } }
 
 io.on("connection", (socket) => {
   console.log("Connected:", socket.id);
 
-  /* DRIVER REGISTER */
-  socket.on("register-driver", () => {
-    socket.role = "driver";
-    drivers[socket.id] = null;
-    console.log("Driver registered:", socket.id);
+  socket.on("set-role", (role) => {
+    socket.role = role;
+    console.log(socket.id, "role:", role);
+
+    if (role === "user") {
+      socket.emit("drivers-init", drivers);
+    }
   });
 
-  /* USER REGISTER */
-  socket.on("register-user", () => {
-    socket.role = "user";
-    console.log("User registered:", socket.id);
-
-    // user ulansa, hozirgi driverlarni yuboramiz
-    socket.emit("drivers-update", drivers);
-  });
-
-  /* DRIVER LOCATION */
   socket.on("send-location", ({ latitude, longitude }) => {
     if (socket.role !== "driver") return;
 
     drivers[socket.id] = { latitude, longitude };
 
-    // faqat userlarga yuboriladi
+    // faqat USERlarga yuboriladi
     io.sockets.sockets.forEach((s) => {
       if (s.role === "user") {
         s.emit("driver-location", {
@@ -65,7 +51,6 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     delete drivers[socket.id];
     io.emit("driver-disconnected", socket.id);
-    console.log("Disconnected:", socket.id);
   });
 });
 
