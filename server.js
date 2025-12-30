@@ -15,11 +15,11 @@ app.use(express.static(path.join(__dirname, "public")));
 
 /* 🔹 ROUTES */
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/views/user.html"));
+  res.sendFile(path.join(__dirname, "public/user.html"));
 });
 
 app.get("/driver", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/views/driver.html"));
+  res.sendFile(path.join(__dirname, "public/driver.html"));
 });
 
 /* 🔹 SOCKET STATE */
