@@ -2,133 +2,46 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Bus / Truck App</title>
+  <title>Bus Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+  <!-- Mapbox -->
   <link
     href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css"
     rel="stylesheet"
   />
 
-  <style>
-    body { margin: 0; font-family: sans-serif; }
-    #map { width: 100%; height: 100vh; display: none; }
-
-    #roleSelect {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      justify-content: center;
-      align-items: center;
-    }
-
-    button {
-      padding: 12px 20px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    #startBtn {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      z-index: 10;
-      display: none;
-    }
-  </style>
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
   <!-- ROLE SELECT -->
-  <div id="roleSelect">
-    <h2>Kim sifatida kirasiz?</h2>
-    <button id="userBtn">👤 Oddiy user</button>
-    <button id="driverBtn">🚚 Driver</button>
+  <div id="roleSelect" class="card">
+    <h2>🚍 Bus Tracker</h2>
+    <p>Kim sifatida kirasiz?</p>
+
+    <button class="btn user" id="userBtn">👤 Oddiy User</button>
+    <button class="btn driver" id="driverBtn">🚚 Driver</button>
   </div>
 
-  <!-- DRIVER BUTTON -->
-  <button id="startBtn">📍 My location</button>
+  <!-- DRIVER FORM -->
+  <div id="driverForm" class="card hidden">
+    <h3>🧑‍✈️ Driver ma'lumotlari</h3>
+
+    <input id="name" placeholder="Ism Familiya" />
+    <input id="phone" placeholder="Telefon raqam" />
+    <input id="busNumber" placeholder="Gazel / Bus raqami" />
+
+    <button class="btn start" id="startBtn">▶ START</button>
+  </div>
 
   <!-- MAP -->
   <div id="map"></div>
 
+  <!-- Scripts -->
   <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
   <script src="/socket.io/socket.io.js"></script>
-
-  <script>
-    const socket = io();
-
-    mapboxgl.accessToken =
-      "pk.eyJ1IjoidW1lZGpvbjk5IiwiYSI6ImNtN3Rza3czdDB1bW4yanF5Nmg4Ym1nbmIifQ.0Z5e4Qzn8La43ouMfIxaWg";
-
-    const map = new mapboxgl.Map({
-      container: "map",
-      style: "mapbox://styles/mapbox/traffic-day-v2",
-      center: [69.47, 40.16],
-      zoom: 13,
-    });
-
-    const drivers = {};
-    let myMarker = null;
-
-    const roleSelect = document.getElementById("roleSelect");
-    const mapDiv = document.getElementById("map");
-    const startBtn = document.getElementById("startBtn");
-
-    // USER
-    document.getElementById("userBtn").onclick = () => {
-      roleSelect.style.display = "none";
-      mapDiv.style.display = "block";
-
-      socket.emit("set-role", "user");
-    };
-
-    // DRIVER
-    document.getElementById("driverBtn").onclick = () => {
-      roleSelect.style.display = "none";
-      mapDiv.style.display = "block";
-      startBtn.style.display = "block";
-
-      socket.emit("set-role", "driver");
-    };
-
-    // DRIVER BUTTON
-    startBtn.onclick = () => {
-      navigator.geolocation.watchPosition((pos) => {
-        const { latitude, longitude } = pos.coords;
-
-        socket.emit("send-location", { latitude, longitude });
-
-        if (!myMarker) {
-          myMarker = new mapboxgl.Marker({ color: "blue" })
-            .setLngLat([longitude, latitude])
-            .addTo(map);
-        } else {
-          myMarker.setLngLat([longitude, latitude]);
-        }
-
-        map.flyTo({ center: [longitude, latitude], zoom: 16 });
-      });
-    };
-
-    // USER — DRIVERLARNI KO‘RADI
-    socket.on("driver-location", ({ id, latitude, longitude }) => {
-      if (!drivers[id]) {
-        drivers[id] = new mapboxgl.Marker({ color: "red" })
-          .setLngLat([longitude, latitude])
-          .addTo(map);
-      } else {
-        drivers[id].setLngLat([longitude, latitude]);
-      }
-    });
-
-    socket.on("driver-disconnected", (id) => {
-      if (drivers[id]) {
-        drivers[id].remove();
-        delete drivers[id];
-      }
-    });
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>

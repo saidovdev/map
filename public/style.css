@@ -1,0 +1,109 @@
+* {
+  box-sizing: border-box;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+/* 🔥 MUHIM */
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+/* BODY */
+body {
+  background: #0f172a;
+  color: #fff;
+  overflow: hidden; /* scroll yo‘q */
+}
+
+/* MAP FULLSCREEN */
+#map {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  display: none;
+  z-index: 1;
+}
+
+/* CARDS (ROLE & DRIVER FORM) */
+.card {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  padding: 20px;
+  text-align: center;
+}
+
+/* TITLES */
+.card h2,
+.card h3 {
+  margin-bottom: 5px;
+}
+
+/* INPUTS */
+input {
+  width: 260px;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  font-size: 15px;
+  outline: none;
+}
+
+/* BUTTONS */
+.btn {
+  width: 260px;
+  padding: 14px;
+  border-radius: 14px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  transform: scale(1.04);
+}
+
+.btn.user {
+  background: #22c55e;
+  color: #062e16;
+}
+
+.btn.driver {
+  background: #f97316;
+  color: #2e1306;
+}
+
+.btn.start {
+  background: #fff;
+  color: #1e293b;
+}
+
+/* HIDE */
+.hidden {
+  display: none !important;
+}
+
+/* MAP POPUP */
+.mapboxgl-popup {
+  max-width: 220px;
+}
+
+.popup {
+  font-size: 14px;
+}
+
+.popup b {
+  color: #2563eb;
+}

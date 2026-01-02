@@ -17,40 +17,72 @@ app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public/index.html"));
 });
 
-const drivers = {}; // { socketId: { lat, lng } }
+/*
+drivers = {
+  socketId: {
+    latitude,
+    longitude,
+    name,
+    phone,
+    busNumber
+  }
+}
+*/
+const drivers = {};
 
 io.on("connection", (socket) => {
-  console.log("Connected:", socket.id);
+  console.log("🔌 Connected:", socket.id);
 
   socket.on("set-role", (role) => {
     socket.role = role;
     console.log(socket.id, "role:", role);
 
+    // USER kirganda barcha driverlarni beramiz
     if (role === "user") {
       socket.emit("drivers-init", drivers);
     }
   });
 
+  // DRIVER start bosganda 1 marta keladi
+  socket.on("driver-start", ({ name, phone, busNumber }) => {
+    socket.role = "driver";
+
+    drivers[socket.id] = {
+      name,
+      phone,
+      busNumber,
+      latitude: null,
+      longitude: null,
+    };
+
+    console.log("🚍 Driver registered:", drivers[socket.id]);
+  });
+
+  // faqat location update
   socket.on("send-location", ({ latitude, longitude }) => {
     if (socket.role !== "driver") return;
+    if (!drivers[socket.id]) return;
 
-    drivers[socket.id] = { latitude, longitude };
+    drivers[socket.id].latitude = latitude;
+    drivers[socket.id].longitude = longitude;
 
     // faqat USERlarga yuboriladi
     io.sockets.sockets.forEach((s) => {
       if (s.role === "user") {
         s.emit("driver-location", {
           id: socket.id,
-          latitude,
-          longitude,
+          ...drivers[socket.id],
         });
       }
     });
   });
 
   socket.on("disconnect", () => {
-    delete drivers[socket.id];
-    io.emit("driver-disconnected", socket.id);
+    if (drivers[socket.id]) {
+      delete drivers[socket.id];
+      io.emit("driver-disconnected", socket.id);
+    }
+    console.log("❌ Disconnected:", socket.id);
   });
 });
 
